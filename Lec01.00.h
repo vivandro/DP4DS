@@ -9,14 +9,15 @@
 namespace VVDP4DS {
 
 template<typename T>
-void swap(T &i, T &j) {
-  T temp = i;
-  i = j;
-  j = temp;
+void swap(T i, T j) {
+  typename T::value_type temp = *i;
+  *i = *j;
+  *j = temp;
 }
 
+// stable min prioritizes a over by b by returning a unless *a is greater than *b
 template<typename T>
-T min(T a, T b) {
+T min_stable(T a, T b) {
   return (*a > *b) ? b : a;
 }
 
@@ -24,10 +25,7 @@ template<typename T>
 T find_min(T beg, T end) {
   T curr_min = beg;
   for(T i = beg; i != end; ++i) {
-    curr_min = VVDP4DS::min(curr_min, i); // Had to add the namespace
-                                          // since g++ on Mac was automatically
-                                          // including algorithm.h and causing
-                                          // namespace conflicts.
+     curr_min = min_stable(curr_min, i);
   }
   return curr_min;
 }
@@ -42,7 +40,8 @@ void sort_insertion(T beg, T end) {
   if( (beg+1) == end ) return; // an array with a single element is already sorted
 
   T min = find_min(beg, end);
-  swap(*beg, *min);
+  VVDP4DS::swap(beg, min); // Had to add the namespace since g++ on Mac was automatically
+                           // including algorithm.h and causing namespace conflicts.
   sort_insertion(beg+1, end); // tail recursion will make this implementation as
                               // efficient as the one using a loop. recursion
                               // makes it easy to understand as well as easy to
